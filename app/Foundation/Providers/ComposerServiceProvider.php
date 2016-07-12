@@ -38,6 +38,7 @@ class ComposerServiceProvider extends ServiceProvider
         $factory->composer('*', CurrentUserComposer::class);
         $factory->composer(['index', 'single-incident', 'subscribe.*', 'signup', 'dashboard.settings.theme', 'emails.*'], ThemeComposer::class);
         $factory->composer('dashboard.*', DashboardComposer::class);
+<<<<<<< a7464e4bfcdc1736f9b26d65b6c61eb87b7412c3
         $factory->composer(['setup', 'dashboard.settings.localization'], TimezoneLocaleComposer::class);
 
         $factory->composer('*', ModuleComposer::class);
@@ -46,6 +47,9 @@ class ComposerServiceProvider extends ServiceProvider
         $factory->composer('partials.modules.scheduled', ScheduledModuleComposer::class);
         $factory->composer('partials.modules.status', StatusModuleComposer::class);
         $factory->composer('partials.modules.timeline', TimelineModuleComposer::class);
+=======
+        $factory->composer(['setup', 'dashboard.actions.add', 'dashboard.settings.localization'], TimezoneLocaleComposer::class);
+>>>>>>> Creating migrations, commands and events for TSA's
     }
 
     /**
