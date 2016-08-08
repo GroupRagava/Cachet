@@ -80,14 +80,17 @@ class DateFactory
      * Make a Carbon instance from a string.
      *
      * @param string|null $time
+     * @param string|null $timezone
      *
      * @throws \InvalidArgumentException
      *
      * @return \Carbon\Carbon
      */
-    public function make($time = null)
+    public function make($time = null, $timezone = null)
     {
-        return (new Date($time))->setTimezone($this->cachetTimezone);
+        $timezone = $timezone ?: $this->cachetTimezone;
+
+        return (new Date($time))->setTimezone($timezone);
     }
 
     /**
