@@ -11,7 +11,6 @@
 
 namespace CachetHQ\Cachet\Foundation\Providers;
 
-use CachetHQ\Cachet\Composers\ActionsComposer;
 use CachetHQ\Cachet\Composers\AppComposer;
 use CachetHQ\Cachet\Composers\CurrentUserComposer;
 use CachetHQ\Cachet\Composers\DashboardComposer;
