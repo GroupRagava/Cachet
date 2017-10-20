@@ -14,9 +14,12 @@ namespace CachetHQ\Cachet\Integrations\Core;
 use CachetHQ\Cachet\Bus\Events\Beacon\BeaconFailedToSendEvent;
 use CachetHQ\Cachet\Bus\Events\Beacon\BeaconWasSentEvent;
 use CachetHQ\Cachet\Integrations\Contracts\Beacon as BeaconContract;
+use CachetHQ\Cachet\Models\Action;
 use CachetHQ\Cachet\Models\Component;
 use CachetHQ\Cachet\Models\Incident;
 use CachetHQ\Cachet\Models\Metric;
+use CachetHQ\Cachet\Models\Schedule;
+use CachetHQ\Cachet\Models\Tag;
 use CachetHQ\Cachet\Models\User;
 use CachetHQ\Cachet\Settings\Repository as Setting;
 use Exception;
@@ -101,6 +104,9 @@ class Beacon implements BeaconContract
                 'incidents'  => Incident::all()->count(),
                 'metrics'    => Metric::all()->count(),
                 'users'      => User::all()->count(),
+                'actions'    => Action::all()->count(),
+                'tags'       => Tag::all()->count(),
+                'schedules'  => Schedule::all()->count(),
             ],
         ];
 
@@ -111,7 +117,6 @@ class Beacon implements BeaconContract
                 'json'    => $payload,
             ]);
         } catch (Exception $e) {
-            // TODO: Log a warning that the beacon could not be sent.
             event(new BeaconFailedToSendEvent());
 
             return;

@@ -12,9 +12,16 @@
 namespace CachetHQ\Cachet\Composers\Modules;
 
 use CachetHQ\Cachet\Models\Metric;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\View\View;
 
+/**
+ * This is the metrics composer.
+ *
+ * @author James Brooks <james@alt-three.com>
+ * @author Connor S. Parks <connor@connorvg.tv>
+ */
 class MetricsComposer
 {
     /**
@@ -25,19 +32,28 @@ class MetricsComposer
     protected $config;
 
     /**
-     * Create a new metrics composer.
+     * The user session object.
+     *
+     * @var \Illuminate\Contracts\Auth\Guard
+     */
+    protected $guard;
+
+    /**
+     * Create a new metrics composer instance.
      *
      * @param \Illuminate\Contracts\Config\Repository $config
+     * @param \Illuminate\Contracts\Auth\Guard        $guard
      *
      * @return void
      */
-    public function __construct(Repository $config)
+    public function __construct(Repository $config, Guard $guard)
     {
         $this->config = $config;
+        $this->guard = $guard;
     }
 
     /**
-     * Metrics view composer.
+     * Bind data to the view.
      *
      * @param \Illuminate\Contracts\View\View $view
      *
@@ -45,12 +61,32 @@ class MetricsComposer
      */
     public function compose(View $view)
     {
-        $metrics = null;
-        if ($displayMetrics = $this->config->get('setting.display_graphs')) {
-            $metrics = Metric::displayable()->orderBy('order')->orderBy('id')->get();
-        }
+        $displayMetrics = $this->config->get('setting.display_graphs');
+        $metrics = $this->getVisibleMetrics($displayMetrics);
 
         $view->withDisplayMetrics($displayMetrics)
             ->withMetrics($metrics);
+    }
+
+    /**
+     * Get visible grouped components.
+     *
+     * @param bool $displayMetrics
+     *
+     * @return \Illuminate\Support\Collection|void
+     */
+    protected function getVisibleMetrics($displayMetrics)
+    {
+        if (!$displayMetrics) {
+            return;
+        }
+
+        $metrics = Metric::displayable();
+
+        if (!$this->guard->check()) {
+            $metrics->visible();
+        }
+
+        return $metrics->orderBy('order')->orderBy('id')->get();
     }
 }

@@ -2,9 +2,7 @@
 
 @section('content')
 <div class="content-panel">
-    @if(isset($sub_menu))
-    @include('dashboard.partials.sub-sidebar')
-    @endif
+    @includeWhen(isset($sub_menu), 'dashboard.partials.sub-sidebar')
     <div class="content-wrapper">
         <div class="header sub-header" id="application-setup">
             <span class="uppercase">
@@ -13,7 +11,7 @@
         </div>
         <div class="row">
             <div class="col-sm-12">
-                <form id="settings-form" name="SettingsForm" class="form-vertical" role="form" action="/dashboard/settings" method="POST" enctype="multipart/form-data">
+                <form id="settings-form" name="SettingsForm" class="form-vertical" role="form" action="{{ cachet_route('dashboard.settings', [], 'post') }}" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     @include('dashboard.partials.errors')
                     <fieldset>
@@ -37,7 +35,7 @@
                             <div class="col-xs-12">
                                 <div class="form-group">
                                     <label>{{ trans('forms.settings.analytics.analytics_piwik_url') }}</label>
-                                    <input type="text" name="app_analytics_piwik_url" class="form-control" value="{{ $app_analytics_piwik_url }}" placeholder="piwik.example.org">
+                                    <input type="text" name="app_analytics_piwik_url" class="form-control" value="{{ $app_analytics_piwik_url }}" placeholder="{{ trans('forms.settings.analytics.analytics_piwik_url') }}">
                                 </div>
                             </div>
                         </div>
@@ -45,7 +43,7 @@
                             <div class="col-xs-12">
                                 <div class="form-group">
                                     <label>{{ trans('forms.settings.analytics.analytics_piwik_siteid') }}</label>
-                                    <input type="number" min="1" max="100" name="app_analytics_piwik_site_id" class="form-control" value="{{ $app_analytics_piwik_site_id }}" placeholder="1">
+                                    <input type="number" min="1" max="100" name="app_analytics_piwik_site_id" class="form-control" value="{{ $app_analytics_piwik_site_id }}" placeholder="{{ trans('forms.settings.analytics.analytics_piwik_siteid') }}">
                                 </div>
                             </div>
                         </div>

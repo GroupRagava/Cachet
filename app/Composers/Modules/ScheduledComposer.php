@@ -11,11 +11,11 @@
 
 namespace CachetHQ\Cachet\Composers\Modules;
 
-use CachetHQ\Cachet\Models\Incident;
+use CachetHQ\Cachet\Models\Schedule;
 use Illuminate\Contracts\View\View;
 
 /**
- * This is the status page composer.
+ * This is the scheduled composer.
  *
  * @author James Brooks <james@alt-three.com>
  * @author Connor S. Parks <connor@connorvg.tv>
@@ -23,7 +23,7 @@ use Illuminate\Contracts\View\View;
 class ScheduledComposer
 {
     /**
-     * Index page view composer.
+     * Bind data to the view.
      *
      * @param \Illuminate\Contracts\View\View $view
      *
@@ -31,7 +31,7 @@ class ScheduledComposer
      */
     public function compose(View $view)
     {
-        $scheduledMaintenance = Incident::scheduled()->orderBy('scheduled_at')->get();
+        $scheduledMaintenance = Schedule::futureSchedules()->orderBy('scheduled_at')->get();
 
         $view->withScheduledMaintenance($scheduledMaintenance);
     }

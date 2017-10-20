@@ -11,15 +11,17 @@
 
 return [
 
-    'dashboard' => 'Dashboard',
+    'dashboard'          => 'Dashboard',
+    'writeable_settings' => 'The Cachet settings directory is not writeable. Please make sure that <code>./bootstrap/cachet</code> is writeable by the web server.',
 
     // Incidents
     'incidents' => [
-        'title'                    => 'Incidents &amp; Schedule',
+        'title'                    => 'Incidents & Maintenance',
         'incidents'                => 'Incidents',
-        'logged'                   => '{0} There are no incidents, good work.|You have logged one incident.|You have reported <strong>:count</strong> incidents.',
+        'logged'                   => '{0} There are no incidents, good work.|[1] You have logged one incident.|[2, Inf] You have reported <strong>:count</strong> incidents.',
         'incident-create-template' => 'Create Template',
         'incident-templates'       => 'Incident Templates',
+        'updates'                  => '{0} Zero Updates|[1] One Update|[2] Two Updates|[3,Inf] Several Updates',
         'add'                      => [
             'title'   => 'Report an incident',
             'success' => 'Incident added.',
@@ -33,6 +35,11 @@ return [
         'delete' => [
             'success' => 'The incident has been deleted and will not show on your status page.',
             'failure' => 'The incident could not be deleted, please try again.',
+        ],
+        'update' => [
+            'title'    => 'Create new incident update',
+            'subtitle' => 'Add an update to <strong>:incident</strong>',
+            'success'  => 'Update added.',
         ],
 
         // Incident templates
@@ -58,22 +65,22 @@ return [
 
     // Incident Maintenance
     'schedule' => [
-        'schedule'     => 'Scheduled Maintenance',
-        'logged'       => '{0} There are no schedules, good work.|You have logged one schedule.|You have reported <strong>:count</strong> schedules.',
+        'schedule'     => 'Maintenance',
+        'logged'       => '{0} There has been no Maintenance, good work.|[1] You have logged one schedule.|[2,Inf] You have reported <strong>:count</strong> schedules.',
         'scheduled_at' => 'Scheduled at :timestamp',
         'add'          => [
-            'title'   => 'Add Scheduled Maintenance',
-            'success' => 'Schedule added.',
-            'failure' => 'Something went wrong adding the schedule, please try again.',
+            'title'   => 'Add Maintenance',
+            'success' => 'Maintenance added.',
+            'failure' => 'Something went wrong adding the Maintenance, please try again.',
         ],
         'edit' => [
-            'title'   => 'Edit Scheduled Maintenance',
-            'success' => 'Schedule has been updated!',
-            'failure' => 'Something went wrong editing the schedule, please try again.',
+            'title'   => 'Edit Maintenance',
+            'success' => 'Maintenance has been updated!',
+            'failure' => 'Something went wrong editing the Maintenance, please try again.',
         ],
         'delete' => [
-            'success' => 'The scheduled maintenance has been deleted and will not show on your status page.',
-            'failure' => 'The scheduled maintenance could not be deleted, please try again.',
+            'success' => 'The Maintenance has been deleted and will not show on your status page.',
+            'failure' => 'The Maintenance could not be deleted, please try again.',
         ],
     ],
 
@@ -140,13 +147,15 @@ return [
     ],
     // Subscribers
     'subscribers' => [
-        'subscribers'      => 'Subscribers',
-        'description'      => 'Subscribers will receive email updates when incidents are created or components are updated.',
-        'verified'         => 'Verified',
-        'not_verified'     => 'Not verified',
-        'subscriber'       => ':email, subscribed :date',
-        'no_subscriptions' => 'Subscribed to all updates',
-        'add'              => [
+        'subscribers'          => 'Subscribers',
+        'description'          => 'Subscribers will receive email updates when incidents are created or components are updated.',
+        'description_disabled' => 'To use this feature, you need allow people to signup for notifications.',
+        'verified'             => 'Verified',
+        'not_verified'         => 'Not verified',
+        'subscriber'           => ':email, subscribed :date',
+        'no_subscriptions'     => 'Subscribed to all updates',
+        'global'               => 'Globally subscribed',
+        'add'                  => [
             'title'   => 'Add a new subscriber',
             'success' => 'Subscriber has been added!',
             'failure' => 'Something went wrong adding the subscriber, please try again.',
@@ -164,7 +173,7 @@ return [
         'team'        => 'Team',
         'member'      => 'Member',
         'profile'     => 'Profile',
-        'description' => 'Team Members will be able to add, modify &amp; edit components and incidents.',
+        'description' => 'Team Members will be able to add, modify & edit components and incidents.',
         'add'         => [
             'title'   => 'Add a new team member',
             'success' => 'Team member added.',
@@ -207,6 +216,14 @@ return [
             'customization' => 'Customization',
             'header'        => 'Custom Header HTML',
             'footer'        => 'Custom Footer HTML',
+        ],
+        'mail' => [
+            'mail'  => 'Mail',
+            'test'  => 'Test',
+            'email' => [
+                'subject' => 'Test notification from Cachet',
+                'body'    => 'This is a test notification from Cachet.',
+            ],
         ],
         'security' => [
             'security'   => 'Security',

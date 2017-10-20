@@ -11,12 +11,12 @@
 
 namespace CachetHQ\Cachet\Composers\Modules;
 
-use CachetHQ\Cachet\Dates\DateFactory;
 use CachetHQ\Cachet\Models\Incident;
+use CachetHQ\Cachet\Services\Dates\DateFactory;
 use Illuminate\Contracts\View\View;
 
 /**
- * This is the status  page composer.
+ * This is the stickied composer.
  *
  * @author James Brooks <james@alt-three.com>
  * @author Connor S. Parks <connor@connorvg.tv>
@@ -25,7 +25,7 @@ use Illuminate\Contracts\View\View;
 class StickiedComposer
 {
     /**
-     * Index page view composer.
+     * Bind data to the view.
      *
      * @param \Illuminate\Contracts\View\View $view
      *
@@ -33,9 +33,10 @@ class StickiedComposer
      */
     public function compose(View $view)
     {
-        $stickiedIncidents = Incident::stickied()->orderBy('scheduled_at', 'desc')->orderBy('created_at', 'desc')->get()->groupBy(function (Incident $incident) {
-            return app(DateFactory::class)->make($incident->is_scheduled ? $incident->scheduled_at : $incident->created_at)->toDateString();
+        $stickiedIncidents = Incident::stickied()->orderBy('occurred_at', 'desc')->get()->groupBy(function (Incident $incident) {
+            return app(DateFactory::class)->make($incident->is_scheduled ? $incident->scheduled_at : $incident->occurred_at)->toDateString();
         });
+
         $view->withStickiedIncidents($stickiedIncidents);
     }
 }

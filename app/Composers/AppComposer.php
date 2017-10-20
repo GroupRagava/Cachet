@@ -11,17 +11,23 @@
 
 namespace CachetHQ\Cachet\Composers;
 
-use CachetHQ\Cachet\Dates\DateFactory;
+use CachetHQ\Cachet\Services\Dates\DateFactory;
 use GrahamCampbell\Markdown\Facades\Markdown;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\View\View;
 
+/**
+ * This is the app composer class.
+ *
+ * @author James Brooks <james@alt-three.com>
+ * @author Graham Campbell <graham@alt-three.com>
+ */
 class AppComposer
 {
     /**
      * The date factory instance.
      *
-     * @var \CachetHQ\Cachet\Dates\DateFactory
+     * @var \CachetHQ\Cachet\Services\Dates\DateFactory
      */
     protected $dates;
 
@@ -35,8 +41,8 @@ class AppComposer
     /**
      * Create a new app composer instance.
      *
-     * @param \CachetHQ\Cachet\Dates\DateFactory      $dates
-     * @param \Illuminate\Contracts\Config\Repository $config
+     * @param \CachetHQ\Cachet\Services\Dates\DateFactory $dates
+     * @param \Illuminate\Contracts\Config\Repository     $config
      *
      * @return void
      */
@@ -75,8 +81,12 @@ class AppComposer
         $view->withAutomaticLocalization($this->config->get('setting.automatic_localization'));
         $view->withEnableExternalDependencies($this->config->get('setting.enable_external_dependencies'));
         $view->withShowTimezone($this->config->get('setting.show_timezone'));
+        $view->withAppRefreshRate($this->config->get('setting.app_refresh_rate'));
         $view->withTimezone($this->dates->getTimezone());
         $view->withSiteTitle($this->config->get('setting.app_name'));
         $view->withFontSubset($this->config->get('langs.'.$this->config->get('app.locale').'.subset', 'latin'));
+        $view->withOnlyDisruptedDays($this->config->get('setting.only_disrupted_days'));
+        $view->withDashboardLink($this->config->get('setting.dashboard_login_link'));
+        $view->withEnableSubscribers($this->config->get('setting.enable_subscribers'));
     }
 }

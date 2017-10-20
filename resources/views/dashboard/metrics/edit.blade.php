@@ -14,21 +14,21 @@
     <div class="row">
         <div class="col-md-12">
             @include('dashboard.partials.errors')
-            <form class='form-vertical' name='MetricsForm' role='form' method='POST'>
+            <form class="form-vertical" name="MetricsForm" role="form" method="POST">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <fieldset>
                     <div class="form-group">
                         <label for="metric-name">{{ trans('forms.metrics.name') }}</label>
-                        <input type="text" class="form-control" name="name" id="metric-name" required value="{{ $metric->name }}">
+                        <input type="text" class="form-control" name="name" id="metric-name" required value="{{ $metric->name }}" placeholder="{{ trans('forms.metrics.name') }}">
                     </div>
                     <div class="form-group">
                         <label for="metric-suffix">{{ trans('forms.metrics.suffix') }}</label>
-                        <input type="text" class="form-control" name="suffix" id="metric-suffix" required value="{{ $metric->suffix }}">
+                        <input type="text" class="form-control" name="suffix" id="metric-suffix" required value="{{ $metric->suffix }}" placeholder="{{ trans('forms.metrics.suffix') }}">
                     </div>
                     <div class="form-group">
                         <label>{{ trans('forms.metrics.description') }}</label>
                         <div class='markdown-control'>
-                            <textarea name="description" class="form-control" rows="5">{{ $metric->description }}</textarea>
+                            <textarea name="description" class="form-control" rows="5" placeholder="{{ trans('forms.metrics.description') }}">{{ $metric->description }}</textarea>
                         </div>
                     </div>
                     <div class="form-group">
@@ -49,15 +49,19 @@
                     </div>
                     <div class="form-group">
                         <label for="metric-default_value">{{ trans('forms.metrics.default-value') }}</label>
-                        <input type="number" class="form-control" name="default_value" id="metric-default_value" value="{{ $metric->default_value }}">
+                        <input type="number" class="form-control" name="default_value" id="metric-default_value" value="{{ $metric->default_value }}" placeholder="{{ trans('forms.metrics.default-value') }}">
                     </div>
                     <div class="form-group">
                         <label for="metric-places">{{ trans('forms.metrics.places') }}</label>
-                        <input type="number" min="0" max="4" class="form-control" name="places" id="metric-places" required value="{{ $metric->places }}">
+                        <input type="number" min="0" max="4" class="form-control" name="places" id="metric-places" required value="{{ $metric->places }}" placeholder="{{ trans('forms.metrics.places') }}">
                     </div>
                     <div class="form-group">
                         <label for="metric-places">{{ trans('forms.metrics.threshold') }}</label>
-                        <input type="number" min="0" max="100" class="form-control" name="threshold" id="metric-threshold" required value="{{ $metric->threshold }}">
+                        <select name="threshold" class="form-control" required>
+                            @foreach ($acceptable_thresholds as $threshold)
+                            <option {{ (int) Binput::old('metric.threshold') === $threshold || $metric->threshold === $threshold ? 'selected' : null }}>{{ $threshold }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="checkbox">
                         <label>
@@ -66,14 +70,22 @@
                             {{ trans('forms.metrics.display-chart') }}
                         </label>
                     </div>
+                    <div class="form-group">
+                        <label>{{ trans('forms.metrics.visibility') }}</label>
+                        <select name="visible" class="form-control" required>
+                            <option value="0" {{ $metric->visible === 0 ? 'selected' : null }}>{{ trans('forms.metrics.visibility_authenticated') }}</option>
+                            <option value="1" {{ $metric->visible === 1 ? 'selected' : null }}>{{ trans('forms.metrics.visibility_public') }}</option>
+                            <option value="2" {{ $metric->visible === 2 ? 'selected' : null }}>{{ trans('forms.metrics.visibility_hidden') }}</option>
+                        </select>
+                    </div>
                 </fieldset>
 
                 <input type="hidden" name="id" value={{$metric->id}}>
 
-                <div class='form-group'>
-                    <div class='btn-group'>
+                <div class="form-group">
+                    <div class="btn-group">
                         <button type="submit" class="btn btn-success">{{ trans('forms.update') }}</button>
-                        <a class="btn btn-default" href="{{ route('dashboard.metrics.index') }}">{{ trans('forms.cancel') }}</a>
+                        <a class="btn btn-default" href="{{ cachet_route('dashboard.metrics') }}">{{ trans('forms.cancel') }}</a>
                     </div>
                 </div>
             </form>

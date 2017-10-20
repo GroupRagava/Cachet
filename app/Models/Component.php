@@ -35,6 +35,7 @@ class Component extends Model implements HasPresenter
         'description' => '',
         'link'        => '',
         'enabled'     => true,
+        'meta'        => null,
     ];
 
     /**
@@ -50,6 +51,7 @@ class Component extends Model implements HasPresenter
         'link'        => 'string',
         'group_id'    => 'int',
         'enabled'     => 'bool',
+        'meta'        => 'json',
         'deleted_at'  => 'date',
     ];
 
@@ -67,6 +69,7 @@ class Component extends Model implements HasPresenter
         'order',
         'group_id',
         'enabled',
+        'meta',
     ];
 
     /**
@@ -75,9 +78,12 @@ class Component extends Model implements HasPresenter
      * @var string[]
      */
     public $rules = [
-        'name'   => 'required|string',
-        'status' => 'int|required',
-        'link'   => 'url',
+        'name'     => 'required|string',
+        'status'   => 'required|int',
+        'order'    => 'nullable|int',
+        'group_id' => 'nullable|int',
+        'link'     => 'nullable|url',
+        'enabled'  => 'required|bool',
     ];
 
     /**
@@ -129,6 +135,16 @@ class Component extends Model implements HasPresenter
     }
 
     /**
+     * Get all of the meta relation.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function meta()
+    {
+        return $this->morphMany(Meta::class, 'meta');
+    }
+
+    /**
      * Get the tags relation.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -148,7 +164,7 @@ class Component extends Model implements HasPresenter
      */
     public function scopeStatus(Builder $query, $status)
     {
-        return $query->where('status', $status);
+        return $query->where('status', '=', $status);
     }
 
     /**
@@ -173,7 +189,24 @@ class Component extends Model implements HasPresenter
      */
     public function scopeEnabled(Builder $query)
     {
-        return $query->where('enabled', true);
+        return $query->where('enabled', '=', true);
+    }
+
+    /**
+     * Find all components which are within visible groups.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param bool                                  $authenticated
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeAuthenticated(Builder $query, $authenticated)
+    {
+        return $query->when(!$authenticated, function (Builder $query) {
+            return $query->whereDoesntHave('group', function (Builder $query) {
+                $query->where('visible', ComponentGroup::VISIBLE_AUTHENTICATED);
+            });
+        });
     }
 
     /**
@@ -185,7 +218,36 @@ class Component extends Model implements HasPresenter
      */
     public function scopeDisabled(Builder $query)
     {
-        return $query->where('enabled', false);
+        return $query->where('enabled', '=', false);
+    }
+
+    /**
+     * Finds all ungrouped components.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeUngrouped(Builder $query)
+    {
+        return $query->enabled()
+            ->where('group_id', '=', 0)
+            ->orderBy('order')
+            ->orderBy('created_at');
+    }
+
+    /**
+     * Finds all grouped components.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeGrouped(Builder $query)
+    {
+        return $query->enabled()
+            ->where('group_id', '>', 0)
+            ->groupBy('group_id');
     }
 
     /**

@@ -30,9 +30,9 @@ class MetricPointTest extends AbstractApiTestCase
 
         $this->get("/api/v1/metrics/{$metric->id}/points");
 
-        $this->seeJson(['id' => $metricPoint[0]->id]);
-        $this->seeJson(['id' => $metricPoint[1]->id]);
-        $this->seeJson(['id' => $metricPoint[2]->id]);
+        $this->seeJsonContains(['id' => $metricPoint[0]->id]);
+        $this->seeJsonContains(['id' => $metricPoint[1]->id]);
+        $this->seeJsonContains(['id' => $metricPoint[2]->id]);
 
         $this->assertResponseOk();
     }
@@ -59,7 +59,7 @@ class MetricPointTest extends AbstractApiTestCase
 
         $this->post("/api/v1/metrics/{$metric->id}/points", $metricPoint->toArray());
 
-        $this->seeJson(['value' => $metricPoint->value]);
+        $this->seeJsonContains(['value' => $metricPoint->value]);
 
         $this->assertResponseOk();
     }
@@ -70,7 +70,6 @@ class MetricPointTest extends AbstractApiTestCase
 
         $metric = factory('CachetHQ\Cachet\Models\Metric')->create();
         $timestamp = 1434369116;
-        $datetime = '2015-06-15 11:51:56';
         $metricPoint = factory('CachetHQ\Cachet\Models\MetricPoint')->make([
             'metric_id' => $metric->id,
         ]);
@@ -79,7 +78,10 @@ class MetricPointTest extends AbstractApiTestCase
 
         $this->post("/api/v1/metrics/{$metric->id}/points", $postData);
 
-        $this->seeJson(['value' => $metricPoint->value, 'created_at' => $datetime]);
+        $this->seeJsonContains([
+            'value'      => $metricPoint->value,
+            'created_at' => date('Y-m-d H:i:s', 1434369116),
+        ]);
 
         $this->assertResponseOk();
     }
@@ -102,7 +104,7 @@ class MetricPointTest extends AbstractApiTestCase
 
         $this->post("/api/v1/metrics/{$metric->id}/points", $postData, ['Time-Zone' => $timezone]);
 
-        $this->seeJson(['value' => $metricPoint->value, 'created_at' => $datetime->toDateTimeString()]);
+        $this->seeJsonContains(['value' => $metricPoint->value, 'created_at' => $datetime->toDateTimeString()]);
 
         $this->assertResponseOk();
     }
@@ -119,7 +121,7 @@ class MetricPointTest extends AbstractApiTestCase
             'value' => 999,
         ]);
 
-        $this->seeJson(['value' => 999]);
+        $this->seeJsonContains(['value' => 999]);
 
         $this->assertResponseOk();
     }

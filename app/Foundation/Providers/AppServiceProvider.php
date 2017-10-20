@@ -12,8 +12,11 @@
 namespace CachetHQ\Cachet\Foundation\Providers;
 
 use AltThree\Bus\Dispatcher;
+use AltThree\Validator\ValidatingMiddleware;
 use CachetHQ\Cachet\Bus\Middleware\UseDatabaseTransactions;
-use CachetHQ\Cachet\Dates\DateFactory;
+use CachetHQ\Cachet\Services\Dates\DateFactory;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
@@ -21,7 +24,7 @@ use Illuminate\Support\Str;
  * This is the app service provider.
  *
  * @author James Brooks <james@alt-three.com>
- * @author Joe Cohen <joe@alt-three.com>
+ * @author Joseph Cohen <joe@alt-three.com>
  * @author Graham Campbell <graham@alt-three.com>
  */
 class AppServiceProvider extends ServiceProvider
@@ -33,15 +36,25 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(Dispatcher $dispatcher)
     {
+        Schema::defaultStringLength(191);
+
         $dispatcher->mapUsing(function ($command) {
             return Dispatcher::simpleMapping($command, 'CachetHQ\Cachet\Bus', 'CachetHQ\Cachet\Bus\Handlers');
         });
 
-        $dispatcher->pipeThrough([UseDatabaseTransactions::class]);
+        $dispatcher->pipeThrough([UseDatabaseTransactions::class, ValidatingMiddleware::class]);
 
         Str::macro('canonicalize', function ($url) {
             return preg_replace('/([^\/])$/', '$1/', $url);
         });
+
+        Relation::morphMap([
+            'components' => \CachetHQ\Cachet\Models\Component::class,
+            'incidents'  => \CachetHQ\Cachet\Models\Incident::class,
+            'metrics'    => \CachetHQ\Cachet\Models\Metric::class,
+            'schedules'  => \CachetHQ\Cachet\Models\Schedule::class,
+            'subscriber' => \CachetHQ\Cachet\Models\Subscriber::class,
+        ]);
     }
 
     /**

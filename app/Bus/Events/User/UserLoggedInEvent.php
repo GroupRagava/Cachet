@@ -11,6 +11,7 @@
 
 namespace CachetHQ\Cachet\Bus\Events\User;
 
+use CachetHQ\Cachet\Bus\Events\ActionInterface;
 use CachetHQ\Cachet\Models\User;
 
 /**
@@ -18,7 +19,7 @@ use CachetHQ\Cachet\Models\User;
  *
  * @author James Brooks <james@alt-three.com>
  */
-final class UserLoggedInEvent implements UserEventInterface
+final class UserLoggedInEvent implements ActionInterface, UserEventInterface
 {
     /**
      * The user that logged in.
@@ -37,5 +38,28 @@ final class UserLoggedInEvent implements UserEventInterface
     public function __construct(User $user)
     {
         $this->user = $user;
+    }
+
+    /**
+     * Get the event description.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return 'User logged in.';
+    }
+
+    /**
+     * Get the event action.
+     *
+     * @return array
+     */
+    public function getAction()
+    {
+        return [
+            'user'        => $this->user,
+            'description' => (string) $this,
+        ];
     }
 }

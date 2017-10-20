@@ -19,10 +19,8 @@ use GrahamCampbell\Binput\Facades\Binput;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Vendor\Laravel\Facade as Google2FA;
 
 class AuthController extends Controller
@@ -45,33 +43,32 @@ class AuthController extends Controller
      */
     public function postLogin()
     {
-        $loginData = Binput::only(['username', 'password']);
+        $loginData = Binput::only(['username', 'password', 'remember_me']);
 
         // Login with username or email.
-        $loginKey = Str::contains($loginData['username'], '@') ? 'email' : 'username';
+        $loginKey = filter_var($loginData['username'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
         $loginData[$loginKey] = array_pull($loginData, 'username');
+
+        $rememberUser = array_pull($loginData, 'remember_me') === '1';
 
         // Validate login credentials.
         if (Auth::validate($loginData)) {
-            // Log the user in for one request.
             Auth::once($loginData);
-            // Do we have Two Factor Auth enabled?
+
             if (Auth::user()->hasTwoFactor) {
-                // Temporarily store the user.
                 Session::put('2fa_id', Auth::user()->id);
 
-                return Redirect::route('auth.two-factor');
+                return cachet_redirect('auth.two-factor');
             }
 
-            // We probably want to add support for "Remember me" here.
-            Auth::attempt($loginData);
+            Auth::attempt($loginData, $rememberUser);
 
             event(new UserLoggedInEvent(Auth::user()));
 
-            return Redirect::intended('dashboard');
+            return Redirect::intended(cachet_route('dashboard'));
         }
 
-        return Redirect::route('auth.login')
+        return cachet_redirect('auth.login')
             ->withInput(Binput::except('password'))
             ->withError(trans('forms.login.invalid'));
     }
@@ -97,30 +94,32 @@ class AuthController extends Controller
     {
         // Check that we have a session.
         if ($userId = Session::pull('2fa_id')) {
-            $code = Binput::get('code');
+            $code = str_replace(' ', '', Binput::get('code'));
 
             // Maybe a temp login here.
             Auth::loginUsingId($userId);
 
-            $valid = Google2FA::verifyKey(Auth::user()->google_2fa_secret, $code);
+            $user = Auth::user();
+
+            $valid = Google2FA::verifyKey($user->google_2fa_secret, $code);
 
             if ($valid) {
-                event(new UserPassedTwoAuthEvent(Auth::user()));
+                event(new UserPassedTwoAuthEvent($user));
 
-                event(new UserLoggedInEvent(Auth::user()));
+                event(new UserLoggedInEvent($user));
 
                 return Redirect::intended('dashboard');
             } else {
-                event(new UserFailedTwoAuthEvent(Auth::user()));
+                event(new UserFailedTwoAuthEvent($user));
 
                 // Failed login, log back out.
                 Auth::logout();
 
-                return Redirect::route('auth.login')->withError(trans('forms.login.invalid-token'));
+                return cachet_redirect('auth.login')->withError(trans('forms.login.invalid-token'));
             }
         }
 
-        return Redirect::route('auth.login')->withError(trans('forms.login.invalid-token'));
+        return cachet_redirect('auth.login')->withError(trans('forms.login.invalid-token'));
     }
 
     /**
@@ -134,6 +133,6 @@ class AuthController extends Controller
 
         Auth::logout();
 
-        return Redirect::to('/');
+        return cachet_redirect('status-page');
     }
 }
